@@ -10,7 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "graphql-yoga": "^1.14.10"
+    "graphql-yoga": "^1.14.10",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.14",

@@ -1,20 +1,24 @@
 import { GraphQLServer } from "graphql-yoga";
+import { v4 } from "uuid";
 
 const users = [
   {
     id: "1",
     name: "Andrew",
     email: "andrew@example.com",
+    age: 24,
   },
   {
     id: "2",
     name: "Sarah",
     email: "sarah@example.com",
+    age: 25,
   },
   {
     id: "3",
     name: "Mike",
     email: "mike@example.com",
+    age: 26,
   },
 ];
 
@@ -51,10 +55,16 @@ const typeDefs = `
         posts(query: String): [Post!]!
     }
 
+    type Mutation {
+      createUser(name: String!, email: String!, age: Int): User!
+      createPost(title: String!, body: String!, published: Boolean!, author: ID!): Post!
+    }
+
     type User {
       id: ID!
       name: String!
       email: String!
+      age: Int
     }
 
     type Post {
@@ -95,7 +105,44 @@ const resolvers = {
       });
     },
   },
-  
+
+  Mutation: {
+    createUser(parent, args, ctx, info) {
+      const emailTaken = users.some((user) => user.email === args.email);
+      if (emailTaken) {
+        throw new Error("Email Taken!");
+      }
+
+      const user = {
+        id: v4(),
+        name: args.name,
+        email: args.email,
+        age: args.age,
+      };
+
+      users.push(user);
+      return user;
+    },
+
+    createPost(parent, args, ctx, info) {
+      const userExist = users.some((user) => user.id === args.author);
+
+      if (!userExist) {
+        throw new Error("User not found");
+      }
+
+      const post = {
+        id: v4(),
+        title: args.title,
+        body: args.body,
+        published: args.author,
+        author: args.author,
+      };
+      posts.push(post);
+      return post;
+    },
+  },
+
   Post: {
     author(parent, args, ctx, info) {
       return users.find((item) => {
