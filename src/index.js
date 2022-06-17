@@ -1,4 +1,5 @@
 import { createServer, renderGraphiQL } from "@graphql-yoga/node";
+import { randomBytes } from "crypto";
 
 const users = [
   {
@@ -471,6 +472,11 @@ const typeDefs = `
         comments: [Comment!]!
     }
 
+    type Mutation {
+      createUser(name: String!, username: String!, email: String!): User!
+      createPost(creator: ID!, title: String!, body: String!): Post!
+    }
+
     type User {
         id: ID!
         name: String!
@@ -514,6 +520,45 @@ const resolvers = {
     },
     comments() {
       return comments;
+    },
+  },
+  Mutation: {
+    createUser(parent, args, context, info) {
+      const { name, username, email } = args;
+      if (
+        users.some((user) => user.email === email || user.username === username)
+      ) {
+        throw new Error("Email or username already token");
+      }
+
+      const newUser = {
+        id: randomBytes(4).toString("base64"),
+        name,
+        email,
+        username,
+        posts: [],
+        comments: [],
+      };
+      users.push(newUser);
+      return newUser;
+    },
+    createPost(parent, args, context, info) {
+      const { creator, title, body } = args;
+      const isuserExist = users.some((user) => user.id === creator);
+
+      if (!isuserExist) {
+        throw new Error("User not found");
+      }
+
+      const newPost = {
+        id: randomBytes(4).toString("base64"),
+        title,
+        body,
+        creator,
+        comments: [],
+      };
+      posts.push(newPost);
+      return newPost;
     },
   },
   Post: {
