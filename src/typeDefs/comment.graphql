@@ -1,0 +1,10 @@
+type Query {
+  comments: [Comment!]!
+}
+
+type Comment {
+  post: Post!
+  id: String!
+  user: User!
+  body: String!
+}

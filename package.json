@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "babel src/index.js -d dist",
+    "build": "babel src --out-dir dist --copy-files",
     "dev": "nodemon src/index.js --exec babel-node",
     "start": "npm run build && node dist/index.js"
   },
@@ -19,7 +19,12 @@
     "nodemon": "^2.0.16"
   },
   "dependencies": {
+    "@graphql-tools/load-files": "^6.5.4",
+    "@graphql-tools/merge": "^8.2.14",
     "@graphql-yoga/node": "^2.9.2",
     "graphql": "^16.5.0"
+  },
+  "nodemonConfig": {
+    "ext": "js, graphql, json"
   }
 }
