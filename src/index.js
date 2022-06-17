@@ -1,7 +1,7 @@
 import { createServer, renderGraphiQL } from "@graphql-yoga/node";
 import { randomBytes } from "crypto";
 
-const users = [
+let users = [
   {
     id: "1",
     name: "Leanne Graham",
@@ -83,7 +83,7 @@ const users = [
     comments: ["46", "47", "48", "49", "50"],
   },
 ];
-const posts = [
+let posts = [
   {
     creator: "1",
     id: "1",
@@ -157,7 +157,7 @@ const posts = [
   },
 ];
 
-const comments = [
+let comments = [
   {
     post: "1",
     id: "1",
@@ -473,8 +473,21 @@ const typeDefs = `
     }
 
     type Mutation {
-      createUser(name: String!, username: String!, email: String!): User!
-      createPost(creator: ID!, title: String!, body: String!): Post!
+      createUser(data: CreateUserInput): User!
+      createPost(data: CreatePostInput): Post!
+      deleteUser(id: ID!): User!
+    }
+
+    input CreateUserInput {
+      name: String!
+      username: String!
+      email: String!
+    }
+
+    input CreatePostInput {
+      creator: ID!
+      title: String!
+      body: String!
     }
 
     type User {
@@ -524,7 +537,7 @@ const resolvers = {
   },
   Mutation: {
     createUser(parent, args, context, info) {
-      const { name, username, email } = args;
+      const { name, username, email } = args.data;
       if (
         users.some((user) => user.email === email || user.username === username)
       ) {
@@ -542,8 +555,32 @@ const resolvers = {
       users.push(newUser);
       return newUser;
     },
+    deleteUser(parent, args, context, info) {
+      const { id } = args;
+      const isUserExist = users.findIndex((user) => user.id === id);
+
+      if (isUserExist === -1) {
+        throw new Error("User not exist");
+      }
+
+      const deletedUsers = users.splice(isUserExist, 1);
+
+      posts = posts.filter((post) => {
+        const match = post.creator === id;
+
+        if (match) {
+          comments = comments.filter((comment) => comment.post !== post.id);
+        }
+
+        return !match;
+      });
+
+      comments = comments.filter((comment) => comment.user !== id);
+
+      return deletedUsers[0];
+    },
     createPost(parent, args, context, info) {
-      const { creator, title, body } = args;
+      const { creator, title, body } = args.data;
       const isuserExist = users.some((user) => user.id === creator);
 
       if (!isuserExist) {
