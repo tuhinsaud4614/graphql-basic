@@ -2,6 +2,20 @@ type Query {
   comments: [Comment!]!
 }
 
+type Mutation {
+  createComment(data: CreateCommentInput!): Comment!
+}
+
+type Subscription {
+  comment(postId: ID!): Comment!
+}
+
+input CreateCommentInput {
+  post: ID!
+  user: ID!
+  body: String!
+}
+
 type Comment {
   post: Post!
   id: String!
