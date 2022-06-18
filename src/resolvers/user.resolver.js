@@ -1,23 +1,25 @@
-import * as data from "../demo-data";
+import { v4 as uuidV4 } from "uuid";
 
-let users = [...data.users];
-let comments = [...data.comments];
-let posts = [...data.posts];
-
-const Query = {
+export const Query = {
   hello: () => "Hello world",
   name: () => "tuhin",
   greeting: (parent, args, context, info) => {
-    console.log(context.req.headers);
     return `Hello ${args.name}`;
   },
-  me: () => users[0],
-  users: () => users,
+  me: (parent, args, context, info) => {
+    const { users } = context.db;
+    return users[0];
+  },
+  users: (parent, args, context, info) => {
+    const { users } = context.db;
+    return users;
+  },
 };
 
-const Mutation = {
+export const Mutation = {
   createUser(parent, args, context, info) {
     const { name, username, email } = args.data;
+    const { users } = context.db;
     if (
       users.some((user) => user.email === email || user.username === username)
     ) {
@@ -25,7 +27,7 @@ const Mutation = {
     }
 
     const newUser = {
-      id: randomBytes(4).toString("base64"),
+      id: uuidV4(),
       name,
       email,
       username,
@@ -38,6 +40,7 @@ const Mutation = {
 
   deleteUser(parent, args, context, info) {
     const { id } = args;
+    const { users, posts, comments } = context.db;
     const isUserExist = users.findIndex((user) => user.id === id);
 
     if (isUserExist === -1) {
@@ -60,17 +63,52 @@ const Mutation = {
 
     return deletedUsers[0];
   },
+
+  updateUser(parent, args, context, info) {
+    const {
+      id,
+      data: { name, username, email },
+    } = args;
+    const { users } = context.db;
+
+    const user = users.find((user) => user.id === id);
+
+    if (!user) {
+      throw new Error("User not exist");
+    }
+
+    if (email) {
+      const emailTaken = users.some((user) => user.email === email);
+      if (emailTaken) {
+        throw new Error("Email already taken");
+      }
+      user.email = email;
+    }
+
+    if (username) {
+      const usernameTaken = users.some((user) => user.username === username);
+      if (usernameTaken) {
+        throw new Error("Username already taken");
+      }
+      user.username = username;
+    }
+
+    if (name) {
+      user.name = name;
+    }
+    return user;
+  },
 };
 
-const User = {
+export const User = {
   posts(parent, args, context, info) {
+    const { posts } = context.db;
     const ps = posts.filter((post) => post.creator === parent.id);
     return ps;
   },
   comments(parent, args, context, info) {
+    const { comments } = context.db;
     const cs = comments.filter((comment) => comment.user === parent.id);
     return cs;
   },
 };
-
-module.exports = { Query, Mutation, User };

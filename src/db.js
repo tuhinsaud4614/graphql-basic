@@ -1,4 +1,4 @@
-export let users = [
+const users = [
   {
     id: "1",
     name: "Leanne Graham",
@@ -80,7 +80,7 @@ export let users = [
     comments: ["46", "47", "48", "49", "50"],
   },
 ];
-export let posts = [
+const posts = [
   {
     creator: "1",
     id: "1",
@@ -154,7 +154,7 @@ export let posts = [
   },
 ];
 
-export let comments = [
+const comments = [
   {
     post: "1",
     id: "1",
@@ -456,3 +456,11 @@ export let comments = [
     body: "eum accusamus aut delectus\narchitecto blanditiis quia sunt\nrerum harum sit quos quia aspernatur vel corrupti inventore\nanimi dicta vel corporis",
   },
 ];
+
+const db = {
+  users,
+  posts,
+  comments,
+};
+
+export default db;

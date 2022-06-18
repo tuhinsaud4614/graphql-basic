@@ -1,21 +1,19 @@
-import * as data from "../demo-data";
-
-let users = [...data.users];
-let comments = [...data.comments];
-let posts = [...data.posts];
-
-const Query = {
-  post() {
+import { v4 as uuid } from "uuid";
+export const Query = {
+  post(parent, args, context, info) {
+    const { posts } = context.db;
     return posts[0];
   },
-  posts() {
+  posts(parent, args, context, info) {
+    const { posts } = context.db;
     return posts;
   },
 };
 
-const Mutation = {
+export const Mutation = {
   createPost(parent, args, context, info) {
     const { creator, title, body } = args.data;
+    const { users, posts } = context.db;
     const isUserExist = users.some((user) => user.id === creator);
 
     if (!isUserExist) {
@@ -23,7 +21,7 @@ const Mutation = {
     }
 
     const newPost = {
-      id: randomBytes(4).toString("base64"),
+      id: uuid(),
       title,
       body,
       creator,
@@ -34,15 +32,15 @@ const Mutation = {
   },
 };
 
-const Post = {
+export const Post = {
   creator(parent, args, context, info) {
+    const { users } = context.db;
     const user = users.find((user) => user.id === parent.creator);
     return user;
   },
   comments(parent, args, context, info) {
+    const { comments } = context.db;
     const c = comments.filter((comment) => comment.post === parent.id);
     return c;
   },
 };
-
-module.exports = { Query, Mutation, Post };
