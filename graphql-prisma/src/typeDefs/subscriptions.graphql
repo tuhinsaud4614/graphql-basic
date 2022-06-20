@@ -1,3 +1,5 @@
-type Subscription {
-  count: Int!
+enum SubscriptionOperationEnum {
+  CREATED
+  UPDATED
+  DELETED
 }

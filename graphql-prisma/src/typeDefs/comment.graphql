@@ -5,12 +5,22 @@ type Query {
 
 type Mutation {
   createComment(data: CreateCommentInput!): Comment!
+  deleteComment(id: ID!): ID!
+}
+
+type Subscription {
+  comment(postId: ID!): CommentSubscription!
 }
 
 input CreateCommentInput {
-  post: Int!
-  author: Int!
+  post: ID!
+  author: ID!
   text: String!
+}
+
+type CommentSubscription {
+  mutation: SubscriptionOperationEnum!
+  data: Comment!
 }
 
 type Comment {
@@ -18,4 +28,6 @@ type Comment {
   post: Post!
   author: User!
   text: String!
+  createdAt: String
+  updatedAt: String
 }

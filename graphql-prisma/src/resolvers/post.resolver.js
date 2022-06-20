@@ -4,9 +4,6 @@ export const Query = {
   async post(parent, args, context, info) {
     const { prisma } = context;
     const { id } = args;
-    if (isNaN(+id)) {
-      return new GraphQLYogaError("Enter a valid post id.");
-    }
 
     try {
       const post = await prisma.post.findFirst({ where: { id: id } });
@@ -23,9 +20,6 @@ export const Query = {
     const { prisma } = context;
     try {
       const posts = await prisma.post.findMany();
-      if (!posts || posts.length === 0) {
-        return new GraphQLYogaError("User not found");
-      }
       return posts;
     } catch (error) {
       return new GraphQLYogaError(error);
@@ -38,19 +32,17 @@ export const Mutation = {
     const { author, title, body } = args.data;
     const { prisma } = context;
 
-    if (isNaN(+author)) {
-      return new GraphQLYogaError("Enter a valid author id.");
-    }
     try {
-      const user = await prisma.user.findFirst({ where: { id: +author } });
+      const user = await prisma.user.findFirst({ where: { id: author } });
 
       if (!user) {
         return new GraphQLYogaError("Author not exist!");
       }
 
       const newPost = await prisma.post.create({
-        data: { title, body, published: false, authorId: +author },
+        data: { title, body, published: false, authorId: author },
       });
+
       return newPost;
     } catch (error) {
       return new GraphQLYogaError(error);
@@ -69,6 +61,19 @@ export const Post = {
         return new GraphQLYogaError("User not found for the post");
       }
       return user;
+    } catch (error) {
+      return new GraphQLYogaError(error);
+    }
+  },
+
+  async comments(parent, args, context, info) {
+    const { prisma } = context;
+    try {
+      const comments = await prisma.comment.findMany({
+        where: { postId: parent.id },
+      });
+
+      return comments;
     } catch (error) {
       return new GraphQLYogaError(error);
     }

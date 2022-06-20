@@ -110,15 +110,27 @@ export const Mutation = {
   // },
 };
 
-// export const User = {
-//   posts(parent, args, context, info) {
-//     const { posts } = context.db;
-//     const ps = posts.filter((post) => post.creator === parent.id);
-//     return ps;
-//   },
-//   comments(parent, args, context, info) {
-//     const { comments } = context.db;
-//     const cs = comments.filter((comment) => comment.user === parent.id);
-//     return cs;
-//   },
-// };
+export const User = {
+  async posts(parent, args, context, info) {
+    try {
+      const { prisma } = context;
+      const posts = await prisma.post.findMany({
+        where: { authorId: parent.id },
+      });
+      return posts;
+    } catch (error) {
+      return new GraphQLYogaError("Posts not found for the user");
+    }
+  },
+  async comments(parent, args, context, info) {
+    try {
+      const { prisma } = context;
+      const comments = await prisma.comment.findMany({
+        where: { authorId: parent.id },
+      });
+      return comments;
+    } catch (error) {
+      return new GraphQLYogaError("Comments not found for the user");
+    }
+  },
+};
