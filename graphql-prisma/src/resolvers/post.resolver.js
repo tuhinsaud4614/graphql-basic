@@ -48,6 +48,27 @@ export const Mutation = {
       return new GraphQLYogaError(error);
     }
   },
+
+  async deletePost(parent, args, ctx, info) {
+    try {
+      const { id } = args;
+      const { prisma } = ctx;
+
+      const post = await prisma.post.findFirst({
+        where: { id },
+      });
+
+      if (!post) {
+        return new GraphQLYogaError("Post not exist!");
+      }
+
+      const deletedPost = await prisma.post.delete({ where: { id } });
+      return id;
+    } catch (error) {
+      console.log(error);
+      return new GraphQLYogaError(error);
+    }
+  },
 };
 
 export const Post = {
