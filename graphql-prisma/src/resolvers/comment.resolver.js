@@ -82,6 +82,43 @@ export const Mutation = {
       return new GraphQLYogaError(error);
     }
   },
+
+  async updateComment(parent, args, ctx, info) {
+    try {
+      const { id, text } = args.data;
+      const { prisma, pubSub } = ctx;
+
+      const comment = await prisma.comment.findFirst({
+        where: { id },
+      });
+
+      if (!comment) {
+        return new GraphQLYogaError("Comment not exist!");
+      }
+
+      if (!text) {
+        return comment;
+      }
+
+      const updatedComment = await prisma.comment.update({
+        where: { id },
+        data: {
+          text,
+        },
+      });
+
+      pubSub.publish(SUBSCRIPTION_FOR_POST_ON_COMMENT(updatedComment.postId), {
+        comment: {
+          mutation: "UPDATED",
+          data: updatedComment,
+        },
+      });
+      return updatedComment;
+    } catch (error) {
+      console.log(error);
+      return new GraphQLYogaError(error);
+    }
+  },
 };
 
 export const Subscription = {

@@ -6,6 +6,7 @@ type Query {
 type Mutation {
   createComment(data: CreateCommentInput!): Comment!
   deleteComment(id: ID!): ID!
+  updateComment(data: UpdateCommentInput!): Comment!
 }
 
 type Subscription {
@@ -16,6 +17,11 @@ input CreateCommentInput {
   post: ID!
   author: ID!
   text: String!
+}
+
+input UpdateCommentInput {
+  id: ID!
+  text: String
 }
 
 type CommentSubscription {
