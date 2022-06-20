@@ -69,6 +69,38 @@ export const Mutation = {
       return new GraphQLYogaError(error);
     }
   },
+
+  async updatePost(parent, args, ctx, info) {
+    try {
+      const { id, title, body, published } = args.data;
+      const { prisma } = ctx;
+
+      const post = await prisma.post.findFirst({
+        where: { id },
+      });
+
+      if (!post) {
+        return new GraphQLYogaError("Post not exist!");
+      }
+
+      if (!title && !body && published === undefined) {
+        return post;
+      }
+
+      const updatedPost = await prisma.post.update({
+        where: { id },
+        data: {
+          title: title || post.title,
+          body: body || post.body,
+          published: published ?? post.published,
+        },
+      });
+      return updatedPost;
+    } catch (error) {
+      console.log(error);
+      return new GraphQLYogaError(error);
+    }
+  },
 };
 
 export const Post = {

@@ -6,12 +6,20 @@ type Query {
 type Mutation {
   createPost(data: CreatePostInput): Post!
   deletePost(id: ID!): ID!
+  updatePost(data: UpdatePostInput!): Post!
 }
 
 input CreatePostInput {
   title: String!
   body: String!
   author: ID!
+}
+
+input UpdatePostInput {
+  id: ID!
+  title: String
+  body: String
+  published: Boolean
 }
 
 type Post {
