@@ -1,9 +1,10 @@
 import { createPubSub, createServer, renderGraphiQL } from "@graphql-yoga/node";
-import prisma from "./prisma";
+import { PrismaClient } from "@prisma/client";
 import resolvers from "./resolvers";
 import typeDefs from "./typeDefs";
 
 const pubSub = createPubSub();
+const prisma = new PrismaClient();
 const server = createServer({
   schema: {
     typeDefs: typeDefs,

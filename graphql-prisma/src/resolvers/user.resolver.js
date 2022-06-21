@@ -48,6 +48,27 @@ export const Mutation = {
     }
   },
 
+  async deleteUser(parent, args, ctx, info) {
+    try {
+      const { id } = args;
+      const { prisma } = ctx;
+
+      const user = await prisma.user.findFirst({
+        where: { id },
+      });
+
+      if (!user) {
+        return new GraphQLYogaError("User not exist!");
+      }
+
+      const deletedUser = await prisma.user.delete({ where: { id } });
+      return id;
+    } catch (error) {
+      console.log(error);
+      return new GraphQLYogaError(error);
+    }
+  },
+
   // deleteUser(parent, args, context, info) {
   //   const { id } = args;
   //   const { users, posts, comments } = context.db;
