@@ -1,4 +1,8 @@
 import { GraphQLYogaError } from "@graphql-yoga/node";
+import { unlink } from "fs";
+import path from "path";
+import { v4 } from "uuid";
+import { AsyncImageSize, fileUpload, IMAGE_MIMES, maxFileSize } from "../utils";
 
 export const Query = {
   user: async (parent, args, context, info) => {
@@ -108,6 +112,75 @@ export const Mutation = {
       return new GraphQLYogaError(error);
     }
   },
+
+  async uploadAvatar(parent, args, ctx, info) {
+    const uId = v4();
+    const dest = path.join(process.cwd(), "images");
+    try {
+      const { id, file } = args;
+      const { prisma } = ctx;
+
+      const isUserExit = await prisma.user.findFirst({
+        where: { id },
+      });
+
+      if (!isUserExit) {
+        return new GraphQLYogaError("User not exist!");
+      }
+
+      const user = await prisma.$transaction(async (prisma) => {
+        const { name, filePath } = await fileUpload(file, {
+          dest: dest,
+          name: uId,
+          filterFunction(newFile, cb) {
+            const { type, size } = newFile;
+            if (!Object.prototype.hasOwnProperty.call(IMAGE_MIMES, type)) {
+              return cb(new GraphQLYogaError("File should be image"));
+            }
+
+            if (size > maxFileSize(5)) {
+              return cb(
+                new GraphQLYogaError("File size should be less than 5 Mb")
+              );
+            }
+
+            cb(null, true);
+          },
+        });
+
+        const dimensions = await AsyncImageSize(filePath);
+
+        const avatar = await prisma.picture.create({
+          data: {
+            url: "images/" + name,
+            width: dimensions?.width || 200,
+            height: dimensions?.height || 200,
+          },
+        });
+
+        const user = await prisma.user.update({
+          where: { id: id },
+          data: { avatarId: avatar.id },
+        });
+
+        return user;
+      });
+      prisma.picture
+        .delete({ where: { id: isUserExit.avatarId } })
+        .then((oldPicture) => {
+          unlink(oldPicture.url, (linkErr) => {
+            if (linkErr) {
+              console.error(linkErr?.message);
+            }
+          });
+        });
+
+      return user;
+    } catch (error) {
+      console.log(error);
+      return new GraphQLYogaError(error);
+    }
+  },
 };
 
 export const User = {
@@ -129,6 +202,17 @@ export const User = {
         where: { authorId: parent.id },
       });
       return comments;
+    } catch (error) {
+      return new GraphQLYogaError("Comments not found for the user");
+    }
+  },
+  async avatar(parent, args, context, info) {
+    try {
+      const { prisma } = context;
+      const avatar = await prisma.picture.findFirst({
+        where: { id: parent.avatarId },
+      });
+      return avatar;
     } catch (error) {
       return new GraphQLYogaError("Comments not found for the user");
     }

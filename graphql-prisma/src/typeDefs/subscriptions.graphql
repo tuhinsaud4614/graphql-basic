@@ -1,5 +1,0 @@
-enum SubscriptionOperationEnum {
-  CREATED
-  UPDATED
-  DELETED
-}

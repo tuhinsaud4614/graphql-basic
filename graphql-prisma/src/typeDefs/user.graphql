@@ -7,6 +7,7 @@ type Mutation {
   createUser(data: CreateUserInput): User!
   deleteUser(id: ID!): ID!
   updateUser(data: UpdateUserInput!): User!
+  uploadAvatar(id: ID!, file: File!): User!
 }
 
 input CreateUserInput {
@@ -24,6 +25,7 @@ type User {
   id: ID!
   name: String!
   email: String!
+  avatar: Picture
   posts: [Post!]!
   comments: [Comment!]!
   createdAt: String

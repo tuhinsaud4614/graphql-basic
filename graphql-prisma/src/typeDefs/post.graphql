@@ -27,6 +27,7 @@ type Post {
   title: String!
   body: String!
   published: Boolean!
+  images: [Picture!]!
   author: User!
   comments: [Comment!]!
   createdAt: String
