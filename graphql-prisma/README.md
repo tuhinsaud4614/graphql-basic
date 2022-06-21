@@ -12,4 +12,4 @@
 
 ### Postman upload file screenshot
 
-<img src="https://https://github.com/tuhinsaud4614/graphql-basic/blob/master/graphql-prisma/screenshots/upload_file_with_postman.png" width=200 height=350 alt="Upload file with postman">
+<img src="https://github.com/tuhinsaud4614/graphql-basic/blob/master/graphql-prisma/screenshots/upload_file_with_postman.png" width=200 height=350 alt="Upload file with postman">
