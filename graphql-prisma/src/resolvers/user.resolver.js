@@ -69,66 +69,45 @@ export const Mutation = {
     }
   },
 
-  // deleteUser(parent, args, context, info) {
-  //   const { id } = args;
-  //   const { users, posts, comments } = context.db;
-  //   const isUserExist = users.findIndex((user) => user.id === id);
+  async updateUser(parent, args, ctx, info) {
+    try {
+      const { id, name, email } = args.data;
+      const { prisma } = ctx;
 
-  //   if (isUserExist === -1) {
-  //     throw new Error("User not exist");
-  //   }
+      const user = await prisma.user.findFirst({
+        where: { id },
+      });
 
-  //   const deletedUsers = users.splice(isUserExist, 1);
+      if (!user) {
+        return new GraphQLYogaError("User not exist!");
+      }
 
-  //   posts = posts.filter((post) => {
-  //     const match = post.creator === id;
+      if (!name && !email) {
+        return user;
+      }
 
-  //     if (match) {
-  //       comments = comments.filter((comment) => comment.post !== post.id);
-  //     }
+      if (email) {
+        const isEmailToken = await prisma.user.findFirst({
+          where: { email: email },
+        });
+        if (isEmailToken) {
+          return new GraphQLYogaError("User already exist");
+        }
+      }
 
-  //     return !match;
-  //   });
-
-  //   comments = comments.filter((comment) => comment.user !== id);
-
-  //   return deletedUsers[0];
-  // },
-
-  // updateUser(parent, args, context, info) {
-  //   const {
-  //     id,
-  //     data: { name, username, email },
-  //   } = args;
-  //   const { users } = context.db;
-
-  //   const user = users.find((user) => user.id === id);
-
-  //   if (!user) {
-  //     throw new Error("User not exist");
-  //   }
-
-  //   if (email) {
-  //     const emailTaken = users.some((user) => user.email === email);
-  //     if (emailTaken) {
-  //       throw new Error("Email already taken");
-  //     }
-  //     user.email = email;
-  //   }
-
-  //   if (username) {
-  //     const usernameTaken = users.some((user) => user.username === username);
-  //     if (usernameTaken) {
-  //       throw new Error("Username already taken");
-  //     }
-  //     user.username = username;
-  //   }
-
-  //   if (name) {
-  //     user.name = name;
-  //   }
-  //   return user;
-  // },
+      const updatedUser = await prisma.user.update({
+        where: { id },
+        data: {
+          name: name ?? user.name,
+          email: email ?? user.email,
+        },
+      });
+      return updatedUser;
+    } catch (error) {
+      console.log(error);
+      return new GraphQLYogaError(error);
+    }
+  },
 };
 
 export const User = {
