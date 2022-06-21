@@ -4,6 +4,7 @@
 /.pnp
 /dist
 /.env
+/images
 .pnp.js
 
 # misc
