@@ -168,11 +168,13 @@ export const Mutation = {
       prisma.picture
         .delete({ where: { id: isUserExit.avatarId } })
         .then((oldPicture) => {
-          unlink(oldPicture.url, (linkErr) => {
-            if (linkErr) {
-              console.error(linkErr?.message);
-            }
-          });
+          if (oldPicture) {
+            unlink(oldPicture.url, (linkErr) => {
+              if (linkErr) {
+                console.error(linkErr?.message);
+              }
+            });
+          }
         });
 
       return user;

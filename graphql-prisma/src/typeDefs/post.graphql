@@ -13,6 +13,8 @@ input CreatePostInput {
   title: String!
   body: String!
   author: ID!
+  file1: File!
+  file2: File
 }
 
 input UpdatePostInput {
