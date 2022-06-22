@@ -121,77 +121,6 @@ export const Mutation = {
       return new GraphQLYogaError(error);
     }
   },
-  // async uploadImages(parent, args, ctx, info) {
-  //   try {
-  //     const uId = v4();
-  //     const dest = path.join(process.cwd(), "images");
-  //     const { id, file1, file2 } = args;
-  //     console.log(file1.size, file2.size);
-  //     const { prisma } = ctx;
-
-  //     // console.log(files);
-
-  //     const isPostExit = await prisma.post.findFirst({
-  //       where: { id },
-  //     });
-
-  //     if (!isPostExit) {
-  //       return new GraphQLYogaError("User not exist!");
-  //     }
-
-  //     // const user = await prisma.$transaction(async (prisma) => {
-  //     //   const { name, filePath } = await fileUpload(file, {
-  //     //     dest: dest,
-  //     //     name: uId,
-  //     //     filterFunction(newFile, cb) {
-  //     //       const { type, size } = newFile;
-  //     //       if (!Object.prototype.hasOwnProperty.call(IMAGE_MIMES, type)) {
-  //     //         return cb(new GraphQLYogaError("File should be image"));
-  //     //       }
-
-  //     //       if (size > maxFileSize(5)) {
-  //     //         return cb(
-  //     //           new GraphQLYogaError("File size should be less than 5 Mb")
-  //     //         );
-  //     //       }
-
-  //     //       cb(null, true);
-  //     //     },
-  //     //   });
-
-  //     //   const dimensions = await AsyncImageSize(filePath);
-
-  //     //   const avatar = await prisma.picture.create({
-  //     //     data: {
-  //     //       url: "images/" + name,
-  //     //       width: dimensions?.width || 200,
-  //     //       height: dimensions?.height || 200,
-  //     //     },
-  //     //   });
-
-  //     //   const user = await prisma.user.update({
-  //     //     where: { id: id },
-  //     //     data: { avatarId: avatar.id },
-  //     //   });
-
-  //     //   return user;
-  //     // });
-  //     // prisma.picture
-  //     //   .delete({ where: { id: isUserExit.avatarId } })
-  //     //   .then((oldPicture) => {
-  //     //     unlink(oldPicture.url, (linkErr) => {
-  //     //       if (linkErr) {
-  //     //         console.error(linkErr?.message);
-  //     //       }
-  //     //     });
-  //     //   });
-
-  //     return isPostExit;
-  //   } catch (error) {
-  //     console.log(error);
-  //     return new GraphQLYogaError(error);
-  //   }
-  // },
 
   async deletePost(parent, args, ctx, info) {
     try {
@@ -279,6 +208,7 @@ export const Post = {
   async images(parent, args, context, info) {
     try {
       const { prisma } = context;
+      // const images = await prisma.post.findUnique({ id: parent.id }).images();
       const images = await prisma.picture.findMany({
         where: { postId: parent.id },
       });

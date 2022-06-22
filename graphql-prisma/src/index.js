@@ -9,6 +9,11 @@ const app = express();
 
 const pubSub = createPubSub();
 const prisma = new PrismaClient();
+// const isUserExit = await prisma.user.findUnique({
+//   where: { id },
+//   select: { avatar: { select: { url: true, id: true } } },
+// });
+
 const server = createServer({
   schema: {
     typeDefs: typeDefs,
@@ -21,8 +26,8 @@ const server = createServer({
   },
 });
 
-app.use("/graphql", server);
 app.use("/images", express.static(path.join(process.cwd(), "images")));
+app.use("/graphql", server);
 
 app.listen(4000, () => {
   console.log("Running a GraphQL API server at http://localhost:4000/graphql");
