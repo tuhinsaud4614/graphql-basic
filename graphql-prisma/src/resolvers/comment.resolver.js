@@ -1,5 +1,5 @@
-import { GraphQLYogaError } from "@graphql-yoga/node";
-import { SUBSCRIPTION_FOR_POST_ON_COMMENT } from "../utils";
+import { GraphQLYogaError } from '@graphql-yoga/node';
+import { SUBSCRIPTION_FOR_POST_ON_COMMENT } from '../utils';
 
 export const Query = {
   async comment(parent, args, context, info) {
@@ -7,13 +7,13 @@ export const Query = {
     const { id } = args;
 
     try {
-      const comment = await prisma.comment.findFirst({ where: { id: id } });
+      const comment = await prisma.comment.findFirst({ where: { id } });
       if (!comment) {
-        return new GraphQLYogaError("Comment not found");
+        return new GraphQLYogaError('Comment not found');
       }
       return comment;
     } catch (error) {
-      return new GraphQLYogaError("Comment not found");
+      return new GraphQLYogaError('Comment not found');
     }
   },
   async comments(parent, args, context, info) {
@@ -24,7 +24,7 @@ export const Query = {
     } catch (error) {
       return new GraphQLYogaError(error);
     }
-  },
+  }
 };
 
 export const Mutation = {
@@ -36,17 +36,17 @@ export const Mutation = {
       const isUser = await prisma.user.findFirst({ where: { id: author } });
       const isPost = await prisma.post.findFirst({ where: { id: post } });
       if (!isUser || !isPost) {
-        return new GraphQLYogaError("Author or Post not exist!");
+        return new GraphQLYogaError('Author or Post not exist!');
       }
 
       const newComment = await prisma.comment.create({
-        data: { text, authorId: author, postId: post },
+        data: { text, authorId: author, postId: post }
       });
       pubSub.publish(SUBSCRIPTION_FOR_POST_ON_COMMENT(post), {
         comment: {
-          mutation: "CREATED",
-          data: newComment,
-        },
+          mutation: 'CREATED',
+          data: newComment
+        }
       });
       return newComment;
     } catch (error) {
@@ -61,20 +61,20 @@ export const Mutation = {
       const { prisma, pubSub } = ctx;
 
       const comment = await prisma.comment.findFirst({
-        where: { id },
+        where: { id }
       });
 
       if (!comment) {
-        return new GraphQLYogaError("Comment not exist!");
+        return new GraphQLYogaError('Comment not exist!');
       }
 
       const deletedComment = await prisma.comment.delete({ where: { id } });
 
       pubSub.publish(SUBSCRIPTION_FOR_POST_ON_COMMENT(comment.postId), {
         comment: {
-          mutation: "DELETED",
-          data: deletedComment,
-        },
+          mutation: 'DELETED',
+          data: deletedComment
+        }
       });
       return id;
     } catch (error) {
@@ -89,11 +89,11 @@ export const Mutation = {
       const { prisma, pubSub } = ctx;
 
       const comment = await prisma.comment.findFirst({
-        where: { id },
+        where: { id }
       });
 
       if (!comment) {
-        return new GraphQLYogaError("Comment not exist!");
+        return new GraphQLYogaError('Comment not exist!');
       }
 
       if (!text) {
@@ -103,22 +103,22 @@ export const Mutation = {
       const updatedComment = await prisma.comment.update({
         where: { id },
         data: {
-          text,
-        },
+          text
+        }
       });
 
       pubSub.publish(SUBSCRIPTION_FOR_POST_ON_COMMENT(updatedComment.postId), {
         comment: {
-          mutation: "UPDATED",
-          data: updatedComment,
-        },
+          mutation: 'UPDATED',
+          data: updatedComment
+        }
       });
       return updatedComment;
     } catch (error) {
       console.log(error);
       return new GraphQLYogaError(error);
     }
-  },
+  }
 };
 
 export const Subscription = {
@@ -130,15 +130,15 @@ export const Subscription = {
         const post = await prisma.post.findFirst({ where: { id: postId } });
 
         if (!post) {
-          return new GraphQLYogaError("Post not found for the comment!");
+          return new GraphQLYogaError('Post not found for the comment!');
         }
         return pubSub.subscribe(SUBSCRIPTION_FOR_POST_ON_COMMENT(postId));
       } catch (error) {
         console.log(error);
         return new GraphQLYogaError(error);
       }
-    },
-  },
+    }
+  }
 };
 
 export const Comment = {
@@ -146,10 +146,10 @@ export const Comment = {
     const { prisma } = context;
     try {
       const user = await prisma.user.findFirst({
-        where: { id: parent.authorId },
+        where: { id: parent.authorId }
       });
       if (!user) {
-        return new GraphQLYogaError("User not found for the comment");
+        return new GraphQLYogaError('User not found for the comment');
       }
       return user;
     } catch (error) {
@@ -160,14 +160,14 @@ export const Comment = {
     const { prisma } = context;
     try {
       const post = await prisma.post.findFirst({
-        where: { id: parent.postId },
+        where: { id: parent.postId }
       });
       if (!post) {
-        return new GraphQLYogaError("Post not found for the comment");
+        return new GraphQLYogaError('Post not found for the comment');
       }
       return post;
     } catch (error) {
       return new GraphQLYogaError(error);
     }
-  },
+  }
 };

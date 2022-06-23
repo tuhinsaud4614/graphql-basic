@@ -16,6 +16,12 @@
     "@babel/core": "^7.18.5",
     "@babel/node": "^7.18.5",
     "@babel/preset-env": "^7.18.2",
+    "eslint": "^8.18.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.3",
+    "eslint-plugin-promise": "^6.0.0",
     "nodemon": "^2.0.16",
     "prisma": "^3.15.2"
   },
@@ -24,11 +30,14 @@
     "@graphql-tools/merge": "^8.2.14",
     "@graphql-yoga/node": "^2.9.2",
     "@prisma/client": "^3.15.2",
+    "bcryptjs": "^2.4.3",
     "express": "^4.18.1",
     "graphql": "^16.5.0",
     "image-size": "^1.0.1",
+    "jsonwebtoken": "^8.5.1",
     "nanoid": "^4.0.0",
-    "uuid": "^8.3.2"
+    "uuid": "^8.3.2",
+    "validator": "^13.7.0"
   },
   "nodemonConfig": {
     "ext": "js, graphql, json"

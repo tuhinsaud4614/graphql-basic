@@ -1,5 +1,8 @@
 {
   "editor.formatOnSave": true,
+  "prettier.singleQuote": true,
+  "prettier.trailingComma": "none",
+  "javascript.format.insertSpaceBeforeFunctionParenthesis": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true,
     "source.fixAll.tslint": true,

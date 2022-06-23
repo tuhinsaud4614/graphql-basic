@@ -5,6 +5,7 @@ type Query {
 
 type Mutation {
   createUser(data: CreateUserInput): User!
+  login(email: String!, password: String!): AuthPayload!
   deleteUser(id: ID!): ID!
   updateUser(data: UpdateUserInput!): User!
   uploadAvatar(id: ID!, file: File!): User!
@@ -13,6 +14,7 @@ type Mutation {
 input CreateUserInput {
   name: String!
   email: String!
+  password: String!
 }
 
 input UpdateUserInput {
@@ -21,10 +23,18 @@ input UpdateUserInput {
   email: String
 }
 
+type AuthPayload {
+  token: String!
+  id: ID!
+  name: String!
+  email: String!
+}
+
 type User {
   id: ID!
   name: String!
   email: String!
+  password: String!
   avatar: Picture
   posts: [Post!]!
   comments: [Comment!]!
